@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -29,6 +30,10 @@ public class GridManager : MonoBehaviour
     [Header("Level Goal")]
     [Tooltip("Grid cell that acts as the level exit. Set manually or auto-set by LevelGenerator.")]
     public Vector3Int goalCell;
+
+    [Header("Step Flash")]
+    [Tooltip("Duration of the white flash when the player lands on a tile.")]
+    public float flashDuration = 0.12f;
 
     [Header("Debug")]
     public bool showDebugGizmos = false;
@@ -79,6 +84,45 @@ public class GridManager : MonoBehaviour
         {
             Debug.LogWarning($"[GridManager] No visited tile assigned! Cell {cell} marked but not visually updated.");
         }
+    }
+
+    /// <summary>Briefly flashes a tile white, then restores its original colour.</summary>
+    public void FlashCell(Vector3Int cell)
+    {
+        StartCoroutine(FlashCoroutine(cell));
+    }
+
+    IEnumerator FlashCoroutine(Vector3Int cell)
+    {
+        Vector3 worldPos = tilemap.GetCellCenterWorld(cell);
+
+        // Spawn a temporary white quad over the tile, above tilemap but below player.
+        GameObject flashObj = new GameObject("TileFlash");
+        flashObj.transform.position = new Vector3(worldPos.x, worldPos.y, -0.1f);
+        flashObj.transform.localScale = new Vector3(tilemap.cellSize.x, tilemap.cellSize.y, 1f);
+
+        SpriteRenderer sr = flashObj.AddComponent<SpriteRenderer>();
+        // Match the tilemap's sorting layer; order 1 = above tilemap (0), below player (set player to 2+).
+        sr.sortingLayerName = tilemap.GetComponent<Renderer>().sortingLayerName;
+        sr.sortingOrder = tilemap.GetComponent<Renderer>().sortingOrder + 1;
+
+        Texture2D tex = new Texture2D(1, 1);
+        tex.SetPixel(0, 0, Color.white);
+        tex.Apply();
+        sr.sprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+
+        // Instant white, then fade out quickly.
+        float elapsed = 0f;
+        float duration = flashDuration * 0.5f; // half the inspector value for a snappier flash
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            sr.color = new Color(1f, 1f, 1f, 1f - (elapsed / duration));
+            yield return null;
+        }
+
+        Destroy(tex);
+        Destroy(flashObj);
     }
 
     /// <summary>Returns true when every non-goal tile has been visited.</summary>

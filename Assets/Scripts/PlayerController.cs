@@ -240,6 +240,9 @@ public class PlayerController : MonoBehaviour
     {
         onLanded?.Invoke();
 
+        // Flash the tile white on landing.
+        GridManager.Instance.FlashCell(cell);
+
         // Never trigger exit/win logic on the starting cell.
         if (cell == _startingCell)
         {
