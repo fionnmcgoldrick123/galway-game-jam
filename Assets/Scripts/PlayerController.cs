@@ -43,6 +43,13 @@ public class PlayerController : MonoBehaviour
     [Header("Debug")]
     public bool showDebugInfo = false;
 
+    // ── events ──────────────────────────────────────────────────────────────
+    /// <summary>Fired every time the player successfully lands on a new tile.</summary>
+    public event System.Action onLanded;
+
+    /// <summary>Fired the moment the player begins moving toward a new tile.</summary>
+    public event System.Action onMoveStarted;
+
     // ── internal state ──────────────────────────────────────────────────────
     private Vector3Int _currentCell;
     private bool       _isMoving;
@@ -175,6 +182,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator MoveToCell(Vector3Int targetCell)
     {
         _isMoving = true;
+        onMoveStarted?.Invoke();
 
         Vector3 startPos = transform.position;
         Vector3 endPos   = GridManager.Instance.CellToWorld(targetCell) + pivotOffset;
@@ -196,6 +204,8 @@ public class PlayerController : MonoBehaviour
 
     void OnLanded(Vector3Int cell)
     {
+        onLanded?.Invoke();
+
         if (cell == GridManager.Instance.goalCell)
         {
             if (GridManager.Instance.HasVisitedAll())
