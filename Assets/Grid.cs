@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -18,8 +19,22 @@ public class GridManager : MonoBehaviour
     [Tooltip("Maximum number of tiles allowed per row (enforced at placement time via HasTile checks).")]
     public int maxTilesPerRow = 3;
 
+    [Header("Tile Visuals")]
+    [Tooltip("Tile to swap in after the player walks on a cell (shows it has been visited).")]
+    public TileBase visitedTile;
+
+    [Tooltip("Tile placed on the goal cell (the final winning tile).")]
+    public TileBase goalTile;
+
+    [Header("Level Goal")]
+    [Tooltip("Grid cell that acts as the level exit. Set manually or auto-set by LevelGenerator.")]
+    public Vector3Int goalCell;
+
     [Header("Debug")]
     public bool showDebugGizmos = false;
+
+    // ── visited tracking ─────────────────────────────────────────────────────
+    private HashSet<Vector3Int> _visited = new HashSet<Vector3Int>();
 
     void Awake()
     {
@@ -29,6 +44,52 @@ public class GridManager : MonoBehaviour
             return;
         }
         Instance = this;
+        
+        // Fresh start on scene reload
+        _visited.Clear();
+    }
+
+    /// <summary>Places the goal tile visually. Call this after all tiles have been placed.</summary>
+    public void SetupGoal()
+    {
+        if (goalTile != null)
+            tilemap.SetTile(goalCell, goalTile);
+    }
+
+    /// <summary>Returns true if this cell has already been stepped on.</summary>
+    public bool IsVisited(Vector3Int cell) => _visited.Contains(cell);
+
+    /// <summary>Marks a cell as visited and swaps its tile to the visited visual.</summary>
+    public void MarkVisited(Vector3Int cell)
+    {
+        if (_visited.Contains(cell)) 
+            return;
+        
+        _visited.Add(cell);
+        
+        if (visitedTile != null)
+        {
+            tilemap.SetTile(cell, visitedTile);
+        }
+        else
+        {
+            Debug.LogWarning($"[GridManager] No visited tile assigned! Cell {cell} marked but not visually updated.");
+        }
+    }
+
+    /// <summary>Returns true when every non-goal tile has been visited.</summary>
+    public bool HasVisitedAll()
+    {
+        int total = 0;
+        BoundsInt bounds = tilemap.cellBounds;
+        foreach (Vector3Int pos in bounds.allPositionsWithin)
+        {
+            // z is always 0 in 2D tilemaps
+            var cell = new Vector3Int(pos.x, pos.y, 0);
+            if (tilemap.HasTile(cell) && cell != goalCell)
+                total++;
+        }
+        return _visited.Count >= total;
     }
 
     /// <summary>Returns true if a tile exists at the given cell coordinate.</summary>

@@ -152,6 +152,7 @@ MonoBehaviour:
   moveTime: 0.05
   pivotOffset: {x: 0, y: 0, z: 0}
   deathDelay: 0.6
+  nextSceneIndex: -1
   showDebugInfo: 0
 --- !u!4 &152293341
 Transform:
@@ -779,11 +780,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 519420032}
+  - component: {fileID: 519420034}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
-  - component: {fileID: 519420034}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -947,6 +948,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 152293341}
   offset: {x: 0, y: 0, z: 0}
+  chaseSpeed: 1.5
+  killMargin: 0.5
+  cameraHalfHeight: 5
+  lookAhead: 2
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -1065,7 +1070,7 @@ MonoBehaviour:
   startCell: {x: 0, y: 0, z: 0}
   pathLength: 40
   maxTilesPerRow: 5
-  maxHorizontalStreak: 3
+  maxHorizontalStreak: 4
   upWeight: 5
   leftWeight: 2
   rightWeight: 2
@@ -1118,6 +1123,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilemap: {fileID: 402653672}
   maxTilesPerRow: 5
+  visitedTile: {fileID: 11400000, guid: 37155d1cd8e5ba54e856498050a2ec87, type: 2}
+  goalTile: {fileID: 11400000, guid: 37155d1cd8e5ba54e856498050a2ec87, type: 2}
+  goalCell: {x: 0, y: 0, z: 0}
   showDebugGizmos: 0
 --- !u!156049354 &2091240461
 Grid:

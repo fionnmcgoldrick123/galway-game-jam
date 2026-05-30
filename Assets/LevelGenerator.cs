@@ -130,7 +130,14 @@ public class LevelGenerator : MonoBehaviour
             placed++;
         }
 
-        Debug.Log($"[LevelGenerator] Placed {placed} tiles. Seed: {seed}.");
+        Debug.Log($"[LevelGenerator] Placed {placed} tiles. Seed: {seed}. Goal cell: {current}.");
+
+        // Register the last tile as the goal cell and apply its visual.
+        if (GridManager.Instance != null)
+        {
+            GridManager.Instance.goalCell = current;
+            GridManager.Instance.SetupGoal();
+        }
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────

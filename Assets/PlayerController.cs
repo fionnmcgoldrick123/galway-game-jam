@@ -29,6 +29,10 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Brief pause before the scene is reloaded after the player dies.")]
     public float deathDelay = 0.6f;
 
+    [Header("Win")]
+    [Tooltip("Scene to load on win. -1 = auto-load the next scene index.")]
+    public int nextSceneIndex = -1;
+
     [Header("Debug")]
     public bool showDebugInfo = false;
 
@@ -50,6 +54,17 @@ public class PlayerController : MonoBehaviour
         // Snap the player to the nearest tile centre.
         _currentCell = GridManager.Instance.WorldToCell(transform.position);
         transform.position = GridManager.Instance.CellToWorld(_currentCell) + pivotOffset;
+
+        // Mark starting tile as visited immediately (with full validation).
+        if (GridManager.Instance.HasTileAt(_currentCell))
+        {
+            GridManager.Instance.MarkVisited(_currentCell);
+            Debug.Log($"[Player] Starting cell {_currentCell} marked as visited.");
+        }
+        else
+        {
+            Debug.LogWarning($"[Player] WARNING: No tile exists at starting position {_currentCell}. Check LevelGenerator or manual tile placement.");
+        }
 
         if (showDebugInfo)
         {
@@ -97,16 +112,21 @@ public class PlayerController : MonoBehaviour
             Debug.Log($"[Player] Current: {_currentCell}, Target: {targetCell}, Has Tile: {GridManager.Instance.HasTileAt(targetCell)}");
         }
 
-        if (GridManager.Instance.HasTileAt(targetCell))
+        if (!GridManager.Instance.HasTileAt(targetCell))
         {
-            // Valid tile – move there.
-            StartCoroutine(MoveToCell(targetCell));
-        }
-        else
-        {
-            // No tile – player dies.
+            // No tile — fall and die.
             StartCoroutine(Die(targetCell));
+            return;
         }
+
+        // Revisiting a tile (that isn't the goal) kills the player.
+        if (targetCell != GridManager.Instance.goalCell && GridManager.Instance.IsVisited(targetCell))
+        {
+            StartCoroutine(Die(targetCell));
+            return;
+        }
+
+        StartCoroutine(MoveToCell(targetCell));
     }
 
     IEnumerator MoveToCell(Vector3Int targetCell)
@@ -127,6 +147,45 @@ public class PlayerController : MonoBehaviour
         transform.position = endPos;
         _currentCell = targetCell;
         _isMoving    = false;
+
+        OnLanded(targetCell);
+    }
+
+    void OnLanded(Vector3Int cell)
+    {
+        if (cell == GridManager.Instance.goalCell)
+        {
+            if (GridManager.Instance.HasVisitedAll())
+                StartCoroutine(Win());
+            else
+                StartCoroutine(DieNotAllVisited());
+        }
+        else
+        {
+            GridManager.Instance.MarkVisited(cell);
+        }
+    }
+
+    IEnumerator Win()
+    {
+        _isDead = true;
+        Debug.Log("[Player] Level complete — loading next scene!");
+        yield return new WaitForSeconds(deathDelay);
+        int target = nextSceneIndex >= 0
+            ? nextSceneIndex
+            : SceneManager.GetActiveScene().buildIndex + 1;
+        if (target < SceneManager.sceneCountInBuildSettings)
+            SceneManager.LoadScene(target);
+        else
+            Debug.Log("[Player] You finished the game!");
+    }
+
+    IEnumerator DieNotAllVisited()
+    {
+        _isDead = true;
+        Debug.Log("[Player] Reached goal but missed some tiles — restarting.");
+        yield return new WaitForSeconds(deathDelay);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     IEnumerator DieFromCamera()
