@@ -286,11 +286,11 @@ public class PlayerController : MonoBehaviour
         _isDead = true;
         if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
 
-        // If the player has visited every tile, skip dialogue and die instead.
-        if (visitedTileDeathEnabled && GridManager.Instance.HasVisitedAll())
+        // If the player hasn't visited all tiles yet, die instead of winning.
+        if (visitedTileDeathEnabled && !GridManager.Instance.HasVisitedAll())
         {
             collectible.Collect();
-            Debug.Log("[Player] Collected item but visited all tiles — dying.");
+            Debug.Log("[Player] Collected item before visiting all tiles — dying.");
             yield return StartCoroutine(PlayDeathThenReload());
             yield break;
         }
