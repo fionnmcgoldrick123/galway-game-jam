@@ -165,11 +165,7 @@ MonoBehaviour:
   poseSprites:
   - {fileID: 1265913059, guid: 12741e45cab4dd244b47b9b04b06d562, type: 3}
   - {fileID: 296985546, guid: 12741e45cab4dd244b47b9b04b06d562, type: 3}
-  - {fileID: 995392201, guid: 12741e45cab4dd244b47b9b04b06d562, type: 3}
   - {fileID: -1882579740, guid: 12741e45cab4dd244b47b9b04b06d562, type: 3}
-  - {fileID: 1694138666, guid: 12741e45cab4dd244b47b9b04b06d562, type: 3}
-  - {fileID: -246874857, guid: 12741e45cab4dd244b47b9b04b06d562, type: 3}
-  - {fileID: -433905961, guid: 12741e45cab4dd244b47b9b04b06d562, type: 3}
   popScaleMultiplier: 1.25
   popDuration: 0.18
   idleDelay: 2

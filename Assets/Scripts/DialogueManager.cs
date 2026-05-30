@@ -217,6 +217,8 @@ public class DialogueManager : MonoBehaviour
                 break;
             }
             bodyText.text += c;
+            if (char.IsLetterOrDigit(c) && AudioManager.Instance != null)
+                AudioManager.Instance.PlayVoice();
             yield return new WaitForSeconds(delay);
         }
 

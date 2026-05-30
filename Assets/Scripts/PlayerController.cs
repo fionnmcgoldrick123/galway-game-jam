@@ -239,6 +239,7 @@ public class PlayerController : MonoBehaviour
     void OnLanded(Vector3Int cell)
     {
         onLanded?.Invoke();
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayLand();
 
         // Flash the tile white on landing.
         GridManager.Instance.FlashCell(cell);
@@ -285,8 +286,18 @@ public class PlayerController : MonoBehaviour
         _isDead = true;
         if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
 
+        // If the player has visited every tile, skip dialogue and die instead.
+        if (visitedTileDeathEnabled && GridManager.Instance.HasVisitedAll())
+        {
+            collectible.Collect();
+            Debug.Log("[Player] Collected item but visited all tiles — dying.");
+            yield return StartCoroutine(PlayDeathThenReload());
+            yield break;
+        }
+
         // Collectible disappears immediately.
         collectible.Collect();
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayPickup();
 
         // Play victory particles, wait for the burst duration, then stop emitting.
         // Using duration instead of IsAlive() so looping systems don't hang the coroutine.
@@ -328,6 +339,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator LoadExitScene(SceneExitTile exit)
     {
         _isDead = true;
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayPickup();
         if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
 
         // Play victory particles if present.
@@ -356,6 +368,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator Win()
     {
         _isDead = true;
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayPickup();
         if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
         Debug.Log("[Player] Level complete — loading next scene!");
 
@@ -422,6 +435,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     IEnumerator PlayDeathThenReload()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayDeath();
         if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
 
         if (_animator != null && !string.IsNullOrEmpty(deathTrigger))
