@@ -60,7 +60,16 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (_isMoving || _isDead) return;
+        if (_isDead) return;
+
+        // Check if the camera has caught up to the player
+        if (CameraFollow.Instance != null && CameraFollow.Instance.IsBelowCamera(transform.position))
+        {
+            StartCoroutine(DieFromCamera());
+            return;
+        }
+
+        if (_isMoving) return;
 
         Vector3Int direction = Vector3Int.zero;
 
@@ -118,6 +127,15 @@ public class PlayerController : MonoBehaviour
         transform.position = endPos;
         _currentCell = targetCell;
         _isMoving    = false;
+    }
+
+    IEnumerator DieFromCamera()
+    {
+        _isDead = true;
+        Debug.Log("[Player] Caught by camera — restarting.");
+        yield return new WaitForSeconds(deathDelay);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
     }
 
     IEnumerator Die(Vector3Int fellIntoCell)
