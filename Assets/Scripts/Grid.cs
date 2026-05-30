@@ -66,6 +66,10 @@ public class GridManager : MonoBehaviour
             return;
         
         _visited.Add(cell);
+
+        // Never overwrite the goal tile with the visited visual.
+        if (cell == goalCell)
+            return;
         
         if (applyVisual && visitedTile != null)
         {

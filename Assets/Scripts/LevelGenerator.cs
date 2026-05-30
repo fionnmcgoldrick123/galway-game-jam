@@ -66,7 +66,10 @@ public class LevelGenerator : MonoBehaviour
 
     void Start()
     {
-        // Generation happens in Awake so tiles exist before PlayerController.Start() runs.
+        // Re-apply the goal tile here as a safety net: if GridManager.Awake hadn't run yet
+        // when Generate() was called in Awake, SetupGoal would have been skipped.
+        if (GridManager.Instance != null)
+            GridManager.Instance.SetupGoal();
     }
 
     /// <summary>Generate a new path. Also callable via the Inspector context menu.</summary>

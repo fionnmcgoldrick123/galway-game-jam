@@ -26,8 +26,11 @@ public class PlayerController : MonoBehaviour
     public Vector3 pivotOffset = Vector3.zero;
 
     [Header("Death")]
-    [Tooltip("Brief pause before the scene is reloaded after the player dies.")]
+    [Tooltip("Brief pause before the scene is reloaded after the player dies. Only used if no Animator or trigger name is set.")]
     public float deathDelay = 0.6f;
+
+    [Tooltip("Animator Trigger parameter name for the death animation. Leave blank to skip.")]
+    public string deathTrigger = "Die";
 
     [Header("Win")]
     [Tooltip("Scene to load on win. -1 = auto-load the next scene index.")]
@@ -55,11 +58,14 @@ public class PlayerController : MonoBehaviour
     private bool       _isMoving;
     private bool       _isDead;
     private bool       _inDialogue;
+    private Animator   _animator;
 
     // ── Unity lifecycle ─────────────────────────────────────────────────────
 
     void Start()
     {
+        _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+
         if (GridManager.Instance == null)
         {
             Debug.LogError("[PlayerController] GridManager not found in scene!");
@@ -222,8 +228,22 @@ public class PlayerController : MonoBehaviour
     IEnumerator Win()
     {
         _isDead = true;
+        if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
         Debug.Log("[Player] Level complete — loading next scene!");
-        yield return new WaitForSeconds(deathDelay);
+
+        // Play victory particle system (child of player) and wait for it to finish.
+        ParticleSystem ps = GetComponentInChildren<ParticleSystem>(true);
+        if (ps != null)
+        {
+            ps.gameObject.SetActive(true);
+            ps.Play();
+            yield return new WaitWhile(() => ps.IsAlive(true));
+        }
+        else
+        {
+            yield return new WaitForSeconds(deathDelay);
+        }
+
         int target = nextSceneIndex >= 0
             ? nextSceneIndex
             : SceneManager.GetActiveScene().buildIndex + 1;
@@ -237,37 +257,65 @@ public class PlayerController : MonoBehaviour
     {
         _isDead = true;
         Debug.Log("[Player] Reached goal but missed some tiles — restarting.");
-        yield return new WaitForSeconds(deathDelay);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        yield return StartCoroutine(PlayDeathThenReload());
     }
 
     IEnumerator DieFromCamera()
     {
         _isDead = true;
         Debug.Log("[Player] Caught by camera — restarting.");
-        yield return new WaitForSeconds(deathDelay);
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+        yield return StartCoroutine(PlayDeathThenReload());
     }
 
     IEnumerator Die(Vector3Int fellIntoCell)
     {
         _isDead = true;
 
-        // Move the player toward the empty cell so it looks like they fell.
-        Vector3 startPos  = transform.position;
+        // Slide the player toward the empty cell so it looks like they fell.
+        Vector3 startPos   = transform.position;
         Vector3 fallTarget = GridManager.Instance.CellToWorld(fellIntoCell) + pivotOffset;
-        float   elapsed   = 0f;
+        float   elapsed    = 0f;
+        float   slideTime  = deathDelay * 0.4f;
 
-        while (elapsed < deathDelay * 0.5f)
+        while (elapsed < slideTime)
         {
             elapsed += Time.deltaTime;
-            transform.position = Vector3.Lerp(startPos, fallTarget, elapsed / (deathDelay * 0.5f));
+            transform.position = Vector3.Lerp(startPos, fallTarget, elapsed / slideTime);
             yield return null;
         }
 
-        yield return new WaitForSeconds(deathDelay * 0.5f);
+        yield return StartCoroutine(PlayDeathThenReload());
+    }
 
+    /// <summary>
+    /// Freezes the camera, re-enables the Animator, and fires the death trigger.
+    /// Scene reload is driven by the animation event on the last frame — see OnDeathAnimationEnd().
+    /// Falls back to deathDelay seconds if no Animator / trigger is set.
+    /// </summary>
+    IEnumerator PlayDeathThenReload()
+    {
+        if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
+
+        if (_animator != null && !string.IsNullOrEmpty(deathTrigger))
+        {
+            // Re-enable in case PlayerDancing disabled it.
+            _animator.enabled = true;
+            _animator.SetTrigger(deathTrigger);
+            // Scene reload is handled by the animation event — nothing more to do here.
+            yield break;
+        }
+
+        // Fallback: no animator configured.
+        yield return new WaitForSeconds(deathDelay);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    /// <summary>
+    /// Called by the Animation Event on the last frame of the death clip.
+    /// Reloads the current scene.
+    /// </summary>
+    public void OnDeathAnimationEnd()
+    {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

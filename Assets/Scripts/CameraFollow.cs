@@ -81,4 +81,11 @@ public class CameraFollow : MonoBehaviour
         if (!chaseEnabled) return false;
         return playerPos.y < BottomEdge - killMargin;
     }
+
+    /// <summary>Stops all camera movement immediately (call on death or win).</summary>
+    public void Freeze()
+    {
+        chaseEnabled = false;
+        enabled      = false;
+    }
 }
