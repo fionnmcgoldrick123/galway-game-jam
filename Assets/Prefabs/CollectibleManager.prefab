@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5029168141544379019
+--- !u!1 &8241399289791383707
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,22 +8,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2466507367104623286}
-  - component: {fileID: 4683433535268881890}
+  - component: {fileID: 2087588554529090473}
+  - component: {fileID: 6742158385411016365}
   m_Layer: 0
-  m_Name: 'Level Generator '
+  m_Name: CollectibleManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2466507367104623286
+--- !u!4 &2087588554529090473
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5029168141544379019}
+  m_GameObject: {fileID: 8241399289791383707}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -32,27 +32,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4683433535268881890
+--- !u!114 &6742158385411016365
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5029168141544379019}
+  m_GameObject: {fileID: 8241399289791383707}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4896aadae4fdfd45a747a657cbcd9e2, type: 3}
+  m_Script: {fileID: 11500000, guid: f47e13611291346479ea4a1c46777c40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilemap: {fileID: 0}
-  tile: {fileID: 11400000, guid: e5ccc18b6af63964e8174e96631782e2, type: 2}
-  startCell: {x: 0, y: 0, z: 0}
-  pathLength: 40
-  maxTilesPerRow: 5
-  maxHorizontalStreak: 4
-  upWeight: 2
-  leftWeight: 10
-  rightWeight: 10
-  winCollectiblePrefab: {fileID: 5029168141544379019}
-  clearOnGenerate: 1
-  seed: 0
+  items:
+  - {fileID: 11400000, guid: 18c4e605670939744ac33dad2f205c15, type: 2}
+  - {fileID: 11400000, guid: 9937581c2ebc31c4ab6db66f91d7f287, type: 2}

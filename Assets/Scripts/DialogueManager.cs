@@ -48,6 +48,9 @@ public class DialogueManager : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
+    /// <summary>Invoked once when the dialogue panel finishes closing. Auto-cleared after each use.</summary>
+    public event System.Action onClosed;
+
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -237,7 +240,15 @@ public class DialogueManager : MonoBehaviour
         if (continuePrompt) continuePrompt.SetActive(false);
         if (darkOverlay) darkOverlay.SetActive(false);
 
-        StartCoroutine(PopOut(() => StartCoroutine(ResumeNextFrame())));
+        // Capture and clear before invoking so re-entrant calls work cleanly.
+        System.Action callback = onClosed;
+        onClosed = null;
+
+        StartCoroutine(PopOut(() =>
+        {
+            callback?.Invoke();
+            StartCoroutine(ResumeNextFrame());
+        }));
     }
 
     IEnumerator ResumeNextFrame()

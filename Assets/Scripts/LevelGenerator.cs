@@ -48,6 +48,10 @@ public class LevelGenerator : MonoBehaviour
     [Tooltip("Chance weight for moving right.")]
     [Range(1, 10)] public int rightWeight = 2;
 
+    [Header("Win Collectible")]
+    [Tooltip("Prefab with WinCollectible component to spawn on the final tile.")]
+    public GameObject winCollectiblePrefab;
+
     [Header("Options")]
     [Tooltip("Clear all tiles on the Tilemap before generating.")]
     public bool clearOnGenerate = true;
@@ -58,6 +62,7 @@ public class LevelGenerator : MonoBehaviour
     // ── internals ────────────────────────────────────────────────────────────
     private Dictionary<int, int> _rowCount = new Dictionary<int, int>();
     private HashSet<Vector3Int>  _placed   = new HashSet<Vector3Int>();
+    private Vector3Int           _goalCell;   // stored for use in Start()
 
     void Awake()
     {
@@ -70,6 +75,24 @@ public class LevelGenerator : MonoBehaviour
         // when Generate() was called in Awake, SetupGoal would have been skipped.
         if (GridManager.Instance != null)
             GridManager.Instance.SetupGoal();
+
+        // Spawn collectible here so CollectibleManager.Instance is guaranteed to exist.
+        if (winCollectiblePrefab != null)
+        {
+            Vector3 worldPos = tilemap.GetCellCenterWorld(_goalCell);
+            GameObject go = Instantiate(winCollectiblePrefab, worldPos, Quaternion.identity);
+            WinCollectible wc = go.GetComponent<WinCollectible>();
+            if (wc != null)
+            {
+                CollectibleItemData item = CollectibleManager.Instance != null
+                    ? CollectibleManager.Instance.GetNext()
+                    : null;
+                if (item != null)
+                    wc.Apply(item);
+                else
+                    Debug.LogWarning("[LevelGenerator] CollectibleManager not found or has no items — collectible will have no sprite/dialogue.");
+            }
+        }
     }
 
     /// <summary>Generate a new path. Also callable via the Inspector context menu.</summary>
@@ -149,11 +172,13 @@ public class LevelGenerator : MonoBehaviour
         }
 
         // Register the last tile as the goal cell and apply its visual.
+        _goalCell = current;
         if (GridManager.Instance != null)
         {
             GridManager.Instance.goalCell = current;
             GridManager.Instance.SetupGoal();
         }
+        // Collectible is spawned in Start() after all Awake() calls have run.
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────

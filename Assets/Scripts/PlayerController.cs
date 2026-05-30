@@ -200,6 +200,19 @@ public class PlayerController : MonoBehaviour
         return null;
     }
 
+    WinCollectible GetCollectibleAtCell(Vector3Int cell)
+    {
+        Vector3 worldPos = GridManager.Instance.CellToWorld(cell);
+        float radius = GridManager.Instance.tilemap.cellSize.x * 0.4f;
+        Collider2D[] hits = Physics2D.OverlapCircleAll(worldPos, radius);
+        foreach (var hit in hits)
+        {
+            WinCollectible c = hit.GetComponent<WinCollectible>();
+            if (c != null) return c;
+        }
+        return null;
+    }
+
     IEnumerator MoveToCell(Vector3Int targetCell)
     {
         _isMoving = true;
@@ -242,6 +255,14 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        // Check for a win collectible.
+        WinCollectible collectible = GetCollectibleAtCell(cell);
+        if (collectible != null)
+        {
+            StartCoroutine(WinWithCollectible(collectible));
+            return;
+        }
+
         if (cell == GridManager.Instance.goalCell)
         {
             // Only enforce "visit all tiles" rule when death is enabled.
@@ -254,6 +275,48 @@ public class PlayerController : MonoBehaviour
         {
             GridManager.Instance.MarkVisited(cell, visitedTileVisualEnabled);
         }
+    }
+
+    IEnumerator WinWithCollectible(WinCollectible collectible)
+    {
+        _isDead = true;
+        if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
+
+        // Collectible disappears immediately.
+        collectible.Collect();
+
+        // Play victory particles and wait for them to finish.
+        ParticleSystem ps = GetComponentInChildren<ParticleSystem>(true);
+        if (ps != null)
+        {
+            ps.gameObject.SetActive(true);
+            ps.Play();
+            yield return new WaitWhile(() => ps.IsAlive(true));
+        }
+        else
+        {
+            yield return new WaitForSeconds(deathDelay);
+        }
+
+        // Play the win dialogue and wait for it to close.
+        if (collectible.Dialogue != null && DialogueManager.Instance != null)
+        {
+            bool dialogueDone = false;
+            DialogueManager.Instance.onClosed += () => dialogueDone = true;
+            _inDialogue = true;
+            DialogueManager.Instance.StartDialogue(collectible.Dialogue);
+            yield return new WaitUntil(() => dialogueDone);
+        }
+
+        // Load next scene.
+        int target = collectible.nextSceneIndex >= 0
+            ? collectible.nextSceneIndex
+            : SceneManager.GetActiveScene().buildIndex + 1;
+
+        if (target < SceneManager.sceneCountInBuildSettings)
+            SceneManager.LoadScene(target);
+        else
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // no next scene — repeat level
     }
 
     IEnumerator LoadExitScene(SceneExitTile exit)
