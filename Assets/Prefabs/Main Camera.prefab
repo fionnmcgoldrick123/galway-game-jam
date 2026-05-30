@@ -50,6 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   offset: {x: 0, y: 0, z: 0}
+  chaseEnabled: 1
   chaseSpeed: 1.5
   killMargin: 0.5
   cameraHalfHeight: 5
@@ -64,7 +65,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.050980393, g: 0.16862746, b: 0.27058825, a: 0}
+  m_BackGroundColor: {r: 0.16078432, g: 0.16862746, b: 0.1882353, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

@@ -59,6 +59,7 @@ public class PlayerController : MonoBehaviour
     private bool       _isDead;
     private bool       _inDialogue;
     private Animator   _animator;
+    private Vector3Int _startingCell;
 
     // ── Unity lifecycle ─────────────────────────────────────────────────────
 
@@ -74,6 +75,7 @@ public class PlayerController : MonoBehaviour
 
         // Snap the player to the nearest tile centre.
         _currentCell = GridManager.Instance.WorldToCell(transform.position);
+        _startingCell = _currentCell;  // Remember where we started
         transform.position = GridManager.Instance.CellToWorld(_currentCell) + pivotOffset;
 
         // Mark starting tile as visited immediately (with full validation).
@@ -185,6 +187,19 @@ public class PlayerController : MonoBehaviour
         return null;
     }
 
+    SceneExitTile GetExitTileAtCell(Vector3Int cell)
+    {
+        Vector3 worldPos = GridManager.Instance.CellToWorld(cell);
+        float radius = GridManager.Instance.tilemap.cellSize.x * 0.4f;
+        Collider2D[] hits = Physics2D.OverlapCircleAll(worldPos, radius);
+        foreach (var hit in hits)
+        {
+            SceneExitTile exit = hit.GetComponent<SceneExitTile>();
+            if (exit != null) return exit;
+        }
+        return null;
+    }
+
     IEnumerator MoveToCell(Vector3Int targetCell)
     {
         _isMoving = true;
@@ -212,6 +227,21 @@ public class PlayerController : MonoBehaviour
     {
         onLanded?.Invoke();
 
+        // Never trigger exit/win logic on the starting cell.
+        if (cell == _startingCell)
+        {
+            GridManager.Instance.MarkVisited(cell, visitedTileVisualEnabled);
+            return;
+        }
+
+        // Check for a scene-exit tile first.
+        SceneExitTile exit = GetExitTileAtCell(cell);
+        if (exit != null)
+        {
+            StartCoroutine(LoadExitScene(exit));
+            return;
+        }
+
         if (cell == GridManager.Instance.goalCell)
         {
             // Only enforce "visit all tiles" rule when death is enabled.
@@ -224,6 +254,34 @@ public class PlayerController : MonoBehaviour
         {
             GridManager.Instance.MarkVisited(cell, visitedTileVisualEnabled);
         }
+    }
+
+    IEnumerator LoadExitScene(SceneExitTile exit)
+    {
+        _isDead = true;
+        if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
+
+        // Play victory particles if present.
+        ParticleSystem ps = GetComponentInChildren<ParticleSystem>(true);
+        if (ps != null)
+        {
+            ps.gameObject.SetActive(true);
+            ps.Play();
+            yield return new WaitWhile(() => ps.IsAlive(true));
+        }
+        else
+        {
+            yield return new WaitForSeconds(deathDelay);
+        }
+
+        int target = exit.nextSceneIndex >= 0
+            ? exit.nextSceneIndex
+            : SceneManager.GetActiveScene().buildIndex + 1;
+
+        if (target < SceneManager.sceneCountInBuildSettings)
+            SceneManager.LoadScene(target);
+        else
+            Debug.Log("[Player] No next scene in build — exit tile reached the end.");
     }
 
     IEnumerator Win()

@@ -140,6 +140,14 @@ public class LevelGenerator : MonoBehaviour
 
         Debug.Log($"[LevelGenerator] Placed {placed} tiles. Seed: {seed}. Goal cell: {current}.");
 
+        // Ensure the goal is never the starting cell (prevent instant win).
+        if (current == startCell)
+        {
+            Debug.LogWarning("[LevelGenerator] Goal cell ended up at start cell! Moving goal up one tile.");
+            current = startCell + Vector3Int.up;
+            PlaceTile(current);
+        }
+
         // Register the last tile as the goal cell and apply its visual.
         if (GridManager.Instance != null)
         {
