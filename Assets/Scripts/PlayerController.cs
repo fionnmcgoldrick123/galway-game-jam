@@ -214,7 +214,8 @@ public class PlayerController : MonoBehaviour
 
         if (cell == GridManager.Instance.goalCell)
         {
-            if (GridManager.Instance.HasVisitedAll())
+            // Only enforce "visit all tiles" rule when death is enabled.
+            if (!visitedTileDeathEnabled || GridManager.Instance.HasVisitedAll())
                 StartCoroutine(Win());
             else
                 StartCoroutine(DieNotAllVisited());

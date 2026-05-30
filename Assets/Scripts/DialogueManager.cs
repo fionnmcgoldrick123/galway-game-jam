@@ -29,6 +29,13 @@ public class DialogueManager : MonoBehaviour
     [Tooltip("Optional indicator shown when player can press to advance.")]
     public GameObject continuePrompt;
 
+    [Tooltip("Full-screen dark overlay panel. Activated only during dialogue.")]
+    public GameObject darkOverlay;
+
+    [Header("Pop Animation")]
+    [Tooltip("Duration of the scale pop-in and pop-out.")]
+    public float popDuration = 0.15f;
+
     [Header("Audio")]
     private AudioSource _audioSource;
 
@@ -51,6 +58,19 @@ public class DialogueManager : MonoBehaviour
 
         if (dialoguePanel) dialoguePanel.SetActive(false);
         if (continuePrompt) continuePrompt.SetActive(false);
+        if (darkOverlay) darkOverlay.SetActive(false);
+
+        // Prevent TMP from wrapping text onto new lines.
+        if (bodyText != null)
+        {
+            bodyText.overflowMode       = TextOverflowModes.Overflow;
+            bodyText.enableWordWrapping = false;
+        }
+        if (speakerText != null)
+        {
+            speakerText.overflowMode       = TextOverflowModes.Overflow;
+            speakerText.enableWordWrapping = false;
+        }
     }
 
     void Update()
@@ -86,7 +106,7 @@ public class DialogueManager : MonoBehaviour
         _lineIndex   = 0;
         IsOpen       = true;
 
-        if (dialoguePanel) dialoguePanel.SetActive(true);
+        if (darkOverlay) darkOverlay.SetActive(true);
         if (continuePrompt) continuePrompt.SetActive(false);
 
         if (sequence.sound != null)
@@ -95,10 +115,64 @@ public class DialogueManager : MonoBehaviour
             _audioSource.PlayOneShot(sequence.sound);
         }
 
+        StartCoroutine(PopIn());
         StartCoroutine(ShowLineWithCooldown(0));
     }
 
-    // ── internals ─────────────────────────────────────────────────────────────
+    // ── internals ──────────────────────────────────────────────────────────────
+
+    IEnumerator PopIn()
+    {
+        if (dialoguePanel == null) yield break;
+        dialoguePanel.SetActive(true);
+
+        RectTransform rt = dialoguePanel.GetComponent<RectTransform>();
+        if (rt == null) yield break;
+
+        float elapsed = 0f;
+        while (elapsed < popDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t  = elapsed / popDuration;
+            rt.localScale = Vector3.one * EaseOutBack(t);
+            yield return null;
+        }
+        rt.localScale = Vector3.one;
+    }
+
+    IEnumerator PopOut(System.Action onDone)
+    {
+        if (dialoguePanel == null) { onDone?.Invoke(); yield break; }
+
+        RectTransform rt = dialoguePanel.GetComponent<RectTransform>();
+        if (rt == null) { onDone?.Invoke(); yield break; }
+
+        float elapsed = 0f;
+        while (elapsed < popDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t  = elapsed / popDuration;
+            rt.localScale = Vector3.one * Mathf.Lerp(1f, 0f, EaseInBack(t));
+            yield return null;
+        }
+        rt.localScale = Vector3.one;
+        dialoguePanel.SetActive(false);
+        onDone?.Invoke();
+    }
+
+    static float EaseOutBack(float t)
+    {
+        const float c1 = 1.70158f;
+        const float c3 = c1 + 1f;
+        return 1f + c3 * Mathf.Pow(t - 1f, 3f) + c1 * Mathf.Pow(t - 1f, 2f);
+    }
+
+    static float EaseInBack(float t)
+    {
+        const float c1 = 1.70158f;
+        const float c3 = c1 + 1f;
+        return c3 * t * t * t - c1 * t * t;
+    }
 
     // Wait one frame so the key that triggered dialogue doesn't immediately advance it
     IEnumerator ShowLineWithCooldown(int index)
@@ -160,11 +234,10 @@ public class DialogueManager : MonoBehaviour
     {
         StopAllCoroutines();
         IsOpen = false;
-        if (dialoguePanel) dialoguePanel.SetActive(false);
         if (continuePrompt) continuePrompt.SetActive(false);
+        if (darkOverlay) darkOverlay.SetActive(false);
 
-        // Wait one frame so the key that closed dialogue isn't also read as a move.
-        StartCoroutine(ResumeNextFrame());
+        StartCoroutine(PopOut(() => StartCoroutine(ResumeNextFrame())));
     }
 
     IEnumerator ResumeNextFrame()
