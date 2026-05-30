@@ -84,13 +84,23 @@ public class LevelGenerator : MonoBehaviour
             WinCollectible wc = go.GetComponent<WinCollectible>();
             if (wc != null)
             {
-                CollectibleItemData item = CollectibleManager.Instance != null
-                    ? CollectibleManager.Instance.GetNext()
-                    : null;
-                if (item != null)
-                    wc.Apply(item);
+                if (CollectibleManager.Instance == null)
+                {
+                    Debug.LogError("[LevelGenerator] CollectibleManager.Instance is null! Make sure a CollectibleManager GameObject exists in the first scene.");
+                }
                 else
-                    Debug.LogWarning("[LevelGenerator] CollectibleManager not found or has no items — collectible will have no sprite/dialogue.");
+                {
+                    CollectibleItemData item = CollectibleManager.Instance.GetNext();
+                    if (item == null)
+                    {
+                        Debug.LogError("[LevelGenerator] GetNext() returned null — CollectibleManager.items array may be empty.");
+                    }
+                    else
+                    {
+                        Debug.Log($"[LevelGenerator] Applying item '{item.name}' to WinCollectible. Dialogue null? {item.dialogue == null}");
+                        wc.Apply(item);
+                    }
+                }
             }
         }
     }

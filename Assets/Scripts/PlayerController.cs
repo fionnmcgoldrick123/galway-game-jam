@@ -285,13 +285,15 @@ public class PlayerController : MonoBehaviour
         // Collectible disappears immediately.
         collectible.Collect();
 
-        // Play victory particles and wait for them to finish.
+        // Play victory particles, wait for the burst duration, then stop emitting.
+        // Using duration instead of IsAlive() so looping systems don't hang the coroutine.
         ParticleSystem ps = GetComponentInChildren<ParticleSystem>(true);
         if (ps != null)
         {
             ps.gameObject.SetActive(true);
             ps.Play();
-            yield return new WaitWhile(() => ps.IsAlive(true));
+            yield return new WaitForSeconds(ps.main.duration);
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         }
         else
         {
@@ -299,6 +301,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Play the win dialogue and wait for it to close.
+        Debug.Log($"[PlayerController] WinWithCollectible: Dialogue={(collectible.Dialogue == null ? "NULL" : "OK")}, DialogueManager={(DialogueManager.Instance == null ? "NULL" : "OK")}");
         if (collectible.Dialogue != null && DialogueManager.Instance != null)
         {
             bool dialogueDone = false;

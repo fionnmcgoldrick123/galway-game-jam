@@ -95,15 +95,20 @@ public class DialogueManager : MonoBehaviour
     {
         if (sequence == null || sequence.lines == null || sequence.lines.Length == 0)
         {
-            Debug.LogError("[DialogueManager] StartDialogue called with null or empty sequence!");
+            Debug.LogError("[DialogueManager] StartDialogue called with null or empty sequence! Assign lines to the DialogueSequence asset.");
+            System.Action cb = onClosed; onClosed = null; cb?.Invoke();
             return;
         }
 
         if (bodyText == null)
         {
-            Debug.LogError("[DialogueManager] Body Text is not assigned! Assign it in the Inspector.");
+            Debug.LogError("[DialogueManager] Body Text is not assigned! Drag DialodueTXT onto the Body Text field on DialogueManager in the Inspector.");
+            System.Action cb = onClosed; onClosed = null; cb?.Invoke();
             return;
         }
+
+        if (dialoguePanel == null)
+            Debug.LogError("[DialogueManager] Dialogue Panel is not assigned! Drag Panel onto the Dialogue Panel field on DialogueManager in the Inspector.");
 
         _sequence    = sequence;
         _lineIndex   = 0;
