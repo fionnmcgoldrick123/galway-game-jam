@@ -37,6 +37,7 @@ public class DialogueManager : MonoBehaviour
     private int              _lineIndex;
     private bool             _isTyping;
     private bool             _skipRequested;
+    private bool             _inputCooldown;
 
     public bool IsOpen { get; private set; }
 
@@ -54,9 +55,9 @@ public class DialogueManager : MonoBehaviour
 
     void Update()
     {
-        if (!IsOpen) return;
+        if (!IsOpen || _inputCooldown) return;
 
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.E))
+        if (Input.anyKeyDown)
         {
             if (_isTyping)
                 _skipRequested = true;
@@ -88,48 +89,49 @@ public class DialogueManager : MonoBehaviour
         if (dialoguePanel) dialoguePanel.SetActive(true);
         if (continuePrompt) continuePrompt.SetActive(false);
 
-        ShowLine(_sequence.lines[0]);
+        if (sequence.sound != null)
+        {
+            _audioSource.volume = sequence.volume;
+            _audioSource.PlayOneShot(sequence.sound);
+        }
+
+        StartCoroutine(ShowLineWithCooldown(0));
     }
 
     // ── internals ─────────────────────────────────────────────────────────────
 
-    void ShowLine(DialogueLine line)
+    // Wait one frame so the key that triggered dialogue doesn't immediately advance it
+    IEnumerator ShowLineWithCooldown(int index)
+    {
+        _inputCooldown = true;
+        yield return null;
+        _inputCooldown = false;
+        ShowLine(index);
+    }
+
+    void ShowLine(int index)
     {
         if (speakerText != null)
             speakerText.text = _sequence.speakerName;
-        else
-            Debug.LogWarning("[DialogueManager] Speaker Text is not assigned in Inspector!");
 
-        if (line.sound != null)
-        {
-            _audioSource.volume = line.volume;
-            _audioSource.PlayOneShot(line.sound);
-        }
-
-        StartCoroutine(TypeLine(line));
+        StartCoroutine(TypeLine(_sequence.lines[index], _sequence.textSpeed));
     }
 
-    IEnumerator TypeLine(DialogueLine line)
+    IEnumerator TypeLine(string text, float speed)
     {
         _isTyping      = true;
         _skipRequested = false;
 
         if (continuePrompt) continuePrompt.SetActive(false);
-
-        if (bodyText == null)
-        {
-            Debug.LogError("[DialogueManager] Body Text is null! Cannot display dialogue.");
-            yield break;
-        }
-
         bodyText.text = string.Empty;
-        float delay = line.textSpeed > 0 ? 1f / line.textSpeed : 0f;
 
-        foreach (char c in line.text)
+        float delay = speed > 0 ? 1f / speed : 0f;
+
+        foreach (char c in text)
         {
             if (_skipRequested)
             {
-                bodyText.text = line.text;
+                bodyText.text = text;
                 break;
             }
             bodyText.text += c;
@@ -146,7 +148,7 @@ public class DialogueManager : MonoBehaviour
 
         if (_lineIndex < _sequence.lines.Length)
         {
-            ShowLine(_sequence.lines[_lineIndex]);
+            ShowLine(_lineIndex);
         }
         else
         {
@@ -161,7 +163,13 @@ public class DialogueManager : MonoBehaviour
         if (dialoguePanel) dialoguePanel.SetActive(false);
         if (continuePrompt) continuePrompt.SetActive(false);
 
-        // Resume camera and player
+        // Wait one frame so the key that closed dialogue isn't also read as a move.
+        StartCoroutine(ResumeNextFrame());
+    }
+
+    IEnumerator ResumeNextFrame()
+    {
+        yield return null;
         PlayerController player = FindObjectOfType<PlayerController>();
         if (player != null) player.ResumeFromDialogue();
     }

@@ -14,4 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speakerName: Person1
   lines:
-  - {fileID: 0}
+  - 'Hello. '
+  - testing.
+  - wdwqduiawbdukwabduiwahuidhwauidhwai
+  textSpeed: 30
+  sound: {fileID: 0}
+  volume: 1
