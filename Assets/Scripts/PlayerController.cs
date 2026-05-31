@@ -2,20 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Grid-based player controller.
-///
-/// Setup:
-///   1. Add this component to your Player GameObject.
-///   2. In the Inspector assign the SpriteRenderer (or leave it and the script
-///      will find it on the same GameObject).
-///   3. Make sure GridManager exists in the scene with its Tilemap assigned.
-///
-/// Movement:
-///   Arrow keys / WASD move the player one cell at a time.
-///   The player animates (lerps) to the centre of the target cell.
-///   If no tile exists at the target cell the player "falls" and the scene restarts.
-/// </summary>
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
@@ -46,11 +32,7 @@ public class PlayerController : MonoBehaviour
     [Header("Debug")]
     public bool showDebugInfo = false;
 
-    // ── events ──────────────────────────────────────────────────────────────
-    /// <summary>Fired every time the player successfully lands on a new tile.</summary>
     public event System.Action onLanded;
-
-    /// <summary>Fired the moment the player begins moving toward a new tile.</summary>
     public event System.Action onMoveStarted;
 
     // ── internal state ──────────────────────────────────────────────────────
@@ -63,52 +45,31 @@ public class PlayerController : MonoBehaviour
     private TrailRenderer _trail;
     private Vector3Int   _startingCell;
 
-    // ── Unity lifecycle ─────────────────────────────────────────────────────
 
     void Start()
     {
         _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         _trail    = GetComponentInChildren<TrailRenderer>();
 
-        // Ensure win particles are hidden until an actual win state activates them.
         ParticleSystem ps = GetComponentInChildren<ParticleSystem>(true);
         if (ps != null)
             ps.gameObject.SetActive(false);
 
         if (GridManager.Instance == null)
-        {
-            Debug.LogError("[PlayerController] GridManager not found in scene!");
             return;
-        }
 
-        // Snap the player to the nearest tile centre.
         _currentCell = GridManager.Instance.WorldToCell(transform.position);
-        _startingCell = _currentCell;  // Remember where we started
+        _startingCell = _currentCell;
         transform.position = GridManager.Instance.CellToWorld(_currentCell) + pivotOffset;
 
-        // Mark starting tile as visited immediately (with full validation).
         if (GridManager.Instance.HasTileAt(_currentCell))
-        {
             GridManager.Instance.MarkVisited(_currentCell, visitedTileVisualEnabled);
-            Debug.Log($"[Player] Starting cell {_currentCell} marked as visited.");
-        }
-        else
-        {
-            Debug.LogWarning($"[Player] WARNING: No tile exists at starting position {_currentCell}. Check LevelGenerator or manual tile placement.");
-        }
-
-        if (showDebugInfo)
-        {
-            Vector3 cellCenter = GridManager.Instance.CellToWorld(_currentCell);
-            Debug.Log($"[Player] Started at cell {_currentCell}, world pos {cellCenter}, final pos {transform.position}, pivot offset {pivotOffset}");
-        }
     }
 
     void Update()
     {
         if (_isDead || _inDialogue || _cutsceneLocked) return;
 
-        // Check if the camera has caught up to the player
         if (CameraFollow.Instance != null && CameraFollow.Instance.IsBelowCamera(transform.position))
         {
             StartCoroutine(DieFromCamera());
@@ -132,32 +93,22 @@ public class PlayerController : MonoBehaviour
             TryMove(direction);
     }
 
-    // ── movement ────────────────────────────────────────────────────────────
-
     void TryMove(Vector3Int direction)
     {
         Vector3Int targetCell = _currentCell + direction;
 
-        if (showDebugInfo)
-        {
-            Debug.Log($"[Player] Current: {_currentCell}, Target: {targetCell}, Has Tile: {GridManager.Instance.HasTileAt(targetCell)}");
-        }
-
         if (!GridManager.Instance.HasTileAt(targetCell))
         {
-            // No tile — fall and die.
             StartCoroutine(Die(targetCell));
             return;
         }
 
-        // Revisiting a tile (that isn't the goal) kills the player.
         if (visitedTileDeathEnabled && targetCell != GridManager.Instance.goalCell && GridManager.Instance.IsVisited(targetCell))
         {
             StartCoroutine(Die(targetCell));
             return;
         }
 
-        // Check for an NPC on the target tile — block movement, pop NPC, start dialogue.
         NPCDialogueTrigger npc = GetNPCAtCell(targetCell);
         if (npc != null)
         {
@@ -176,21 +127,18 @@ public class PlayerController : MonoBehaviour
             DialogueManager.Instance.StartDialogue(npc.dialogue);
     }
 
-    /// <summary>Called by DialogueManager when dialogue closes. Ignored while a cutscene is running.</summary>
     public void ResumeFromDialogue()
     {
         if (_cutsceneLocked) return;
         _inDialogue = false;
     }
 
-    /// <summary>Called by OpeningCutscene to hard-lock input for the full cutscene duration.</summary>
     public void LockInput()
     {
         _cutsceneLocked = true;
         _inDialogue     = true;
     }
 
-    /// <summary>Called by OpeningCutscene when the cutscene finishes to restore full control.</summary>
     public void UnlockCutscene()
     {
         _cutsceneLocked = false;
@@ -264,17 +212,14 @@ public class PlayerController : MonoBehaviour
         onLanded?.Invoke();
         if (AudioManager.Instance != null) AudioManager.Instance.PlayLand();
 
-        // Flash the tile white on landing.
         GridManager.Instance.FlashCell(cell);
 
-        // Never trigger exit/win logic on the starting cell.
         if (cell == _startingCell)
         {
             GridManager.Instance.MarkVisited(cell, visitedTileVisualEnabled);
             return;
         }
 
-        // Check for a scene-exit tile first.
         SceneExitTile exit = GetExitTileAtCell(cell);
         if (exit != null)
         {
@@ -282,7 +227,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Check for a win collectible.
         WinCollectible collectible = GetCollectibleAtCell(cell);
         if (collectible != null)
         {
@@ -292,7 +236,6 @@ public class PlayerController : MonoBehaviour
 
         if (cell == GridManager.Instance.goalCell)
         {
-            // Only enforce "visit all tiles" rule when death is enabled.
             if (!visitedTileDeathEnabled || GridManager.Instance.HasVisitedAll())
                 StartCoroutine(Win());
             else
@@ -313,17 +256,13 @@ public class PlayerController : MonoBehaviour
         if (visitedTileDeathEnabled && !GridManager.Instance.HasVisitedAll())
         {
             collectible.Collect();
-            Debug.Log("[Player] Collected item before visiting all tiles — dying.");
             yield return StartCoroutine(PlayDeathThenReload());
             yield break;
         }
 
-        // Collectible disappears immediately.
         collectible.Collect();
         if (AudioManager.Instance != null) AudioManager.Instance.PlayPickup();
 
-        // Play victory particles, wait for the burst duration, then stop emitting.
-        // Using duration instead of IsAlive() so looping systems don't hang the coroutine.
         ParticleSystem ps = GetComponentInChildren<ParticleSystem>(true);
         if (ps != null)
         {
@@ -337,8 +276,6 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForSeconds(deathDelay);
         }
 
-        // Play the win dialogue and wait for it to close.
-        Debug.Log($"[PlayerController] WinWithCollectible: Dialogue={(collectible.Dialogue == null ? "NULL" : "OK")}, DialogueManager={(DialogueManager.Instance == null ? "NULL" : "OK")}");
         if (collectible.Dialogue != null && DialogueManager.Instance != null)
         {
             bool dialogueDone = false;
@@ -348,7 +285,6 @@ public class PlayerController : MonoBehaviour
             yield return new WaitUntil(() => dialogueDone);
         }
 
-        // Load next scene.
         int target = collectible.nextSceneIndex >= 0
             ? collectible.nextSceneIndex
             : SceneManager.GetActiveScene().buildIndex + 1;
@@ -356,7 +292,7 @@ public class PlayerController : MonoBehaviour
         if (target < SceneManager.sceneCountInBuildSettings)
             SceneManager.LoadScene(target);
         else
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // no next scene — repeat level
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     IEnumerator LoadExitScene(SceneExitTile exit)
@@ -384,8 +320,6 @@ public class PlayerController : MonoBehaviour
 
         if (target < SceneManager.sceneCountInBuildSettings)
             SceneManager.LoadScene(target);
-        else
-            Debug.Log("[Player] No next scene in build — exit tile reached the end.");
     }
 
     IEnumerator Win()
@@ -393,9 +327,7 @@ public class PlayerController : MonoBehaviour
         _isDead = true;
         if (AudioManager.Instance != null) AudioManager.Instance.PlayPickup();
         if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
-        Debug.Log("[Player] Level complete — loading next scene!");
 
-        // Play victory particle system (child of player) and wait for it to finish.
         ParticleSystem ps = GetComponentInChildren<ParticleSystem>(true);
         if (ps != null)
         {
@@ -413,14 +345,11 @@ public class PlayerController : MonoBehaviour
             : SceneManager.GetActiveScene().buildIndex + 1;
         if (target < SceneManager.sceneCountInBuildSettings)
             SceneManager.LoadScene(target);
-        else
-            Debug.Log("[Player] You finished the game!");
     }
 
     IEnumerator DieNotAllVisited()
     {
         _isDead = true;
-        Debug.Log("[Player] Reached goal but missed some tiles — restarting.");
         yield return StartCoroutine(PlayDeathThenReload());
     }
 
@@ -430,7 +359,6 @@ public class PlayerController : MonoBehaviour
         _isMoving = false;
         StopAllCoroutines();
         ClearTrail();
-        Debug.Log("[Player] Caught by camera — restarting.");
         StartCoroutine(PlayDeathThenReload());
         yield break;
     }
@@ -440,7 +368,6 @@ public class PlayerController : MonoBehaviour
         _isDead = true;
         ClearTrail();
 
-        // Slide the player toward the empty cell so it looks like they fell.
         Vector3 startPos   = transform.position;
         Vector3 fallTarget = GridManager.Instance.CellToWorld(fellIntoCell) + pivotOffset;
         float   elapsed    = 0f;
@@ -456,11 +383,6 @@ public class PlayerController : MonoBehaviour
         yield return StartCoroutine(PlayDeathThenReload());
     }
 
-    /// <summary>
-    /// Freezes the camera, re-enables the Animator, and fires the death trigger.
-    /// Scene reload is driven by the animation event on the last frame — see OnDeathAnimationEnd().
-    /// Falls back to deathDelay seconds if no Animator / trigger is set.
-    /// </summary>
     IEnumerator PlayDeathThenReload()
     {
         ClearTrail();
@@ -469,17 +391,14 @@ public class PlayerController : MonoBehaviour
 
         if (_animator != null && !string.IsNullOrEmpty(deathTrigger))
         {
-            // Re-enable in case PlayerDancing disabled it.
             _animator.enabled = true;
             _animator.SetTrigger(deathTrigger);
-            // Wait for animation event, but cap with a timeout so we never hang.
             float waited = 0f;
             while (waited < deathDelay + 2f)
             {
                 waited += Time.deltaTime;
                 yield return null;
             }
-            // If we reach here the animation event never fired — reload anyway.
         }
         else
         {
@@ -496,17 +415,11 @@ public class PlayerController : MonoBehaviour
         _trail.Clear();
     }
 
-    /// <summary>
-    /// Called by the Animation Event on the last frame of the death clip.
-    /// Reloads the current scene.
-    /// </summary>
     public void OnDeathAnimationEnd()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // ── public helpers ──────────────────────────────────────────────────────
 
-    /// <summary>The cell the player is currently standing on.</summary>
     public Vector3Int CurrentCell => _currentCell;
 }

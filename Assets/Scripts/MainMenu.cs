@@ -29,7 +29,6 @@ public class MainMenu : MonoBehaviour
         {
             buttonBaseScale = playButton.localScale;
 
-            // Add hover event triggers dynamically
             EventTrigger trigger = playButton.GetComponent<EventTrigger>();
             if (trigger == null)
                 trigger = playButton.gameObject.AddComponent<EventTrigger>();
@@ -54,7 +53,7 @@ public class MainMenu : MonoBehaviour
     {
         if (logoUI == null) return;
 
-        float t = (Mathf.Sin(Time.time * breatheSpeed) + 1f) / 2f; // 0..1
+        float t = (Mathf.Sin(Time.time * breatheSpeed) + 1f) / 2f;
         float scale = Mathf.Lerp(breatheScaleMin, breatheScaleMax, t);
         logoUI.localScale = logoBaseScale * scale;
     }

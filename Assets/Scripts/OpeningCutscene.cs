@@ -2,19 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Drives a linear opening cutscene made up of sequential beats.
-///
-/// Each beat plays a DialogueSequence, then optionally:
-///   - Hides one character (fades out or snaps off)
-///   - Slides one or more characters up by one grid cell
-///
-/// Setup:
-///   1. Add this component to any persistent GameObject in the opening scene.
-///   2. Build your beats array in the Inspector.
-///   3. Make sure DialogueManager and GridManager are present in the scene.
-///   4. Make sure the Player has a PlayerController component.
-/// </summary>
 public class OpeningCutscene : MonoBehaviour
 {
     [Header("Cutscene Beats")]
@@ -49,13 +36,11 @@ public class OpeningCutscene : MonoBehaviour
 
     private IEnumerator PlayCutscene()
     {
-        // Lock player movement for the entire cutscene.
         if (_player != null)
             _player.LockInput();
 
         foreach (CutsceneBeat beat in beats)
         {
-            // --- Play dialogue ---
             if (beat.dialogue != null)
             {
                 bool dialogueDone = false;
@@ -64,7 +49,6 @@ public class OpeningCutscene : MonoBehaviour
                 yield return new WaitUntil(() => dialogueDone);
             }
 
-            // --- Hide character ---
             if (beat.characterToHide != null)
             {
                 if (fadeOutCharacter)
@@ -73,7 +57,6 @@ public class OpeningCutscene : MonoBehaviour
                     beat.characterToHide.SetActive(false);
             }
 
-            // --- Move characters up one grid cell (all at once) ---
             if (beat.charactersToMoveUp != null && beat.charactersToMoveUp.Length > 0)
             {
                 float gridStep = GetGridCellWidth();
@@ -85,7 +68,6 @@ public class OpeningCutscene : MonoBehaviour
                         moves[i] = StartCoroutine(MoveRight(beat.charactersToMoveUp[i], gridStep));
                 }
 
-                // Wait for every movement to finish before continuing.
                 foreach (Coroutine move in moves)
                     if (move != null)
                         yield return move;
@@ -95,7 +77,6 @@ public class OpeningCutscene : MonoBehaviour
                 yield return new WaitForSeconds(pauseBetweenBeats);
         }
 
-        // Cutscene over — load next scene.
         if (_player != null)
             _player.UnlockCutscene();
 
@@ -106,14 +87,12 @@ public class OpeningCutscene : MonoBehaviour
         SceneManager.LoadScene(nextIndex);
     }
 
-    // ── helpers ──────────────────────────────────────────────────────────────
 
     private float GetGridCellWidth()
     {
         if (GridManager.Instance != null)
             return GridManager.Instance.tilemap.cellSize.x;
 
-        // Fallback if GridManager isn't present (shouldn't happen in a normal scene).
         return 1f;
     }
 
@@ -127,7 +106,6 @@ public class OpeningCutscene : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             float t = elapsed / characterMoveTime;
-            // Smooth ease-out so it doesn't feel robotic.
             character.transform.position = Vector3.Lerp(startPos, endPos, EaseOutQuad(t));
             yield return null;
         }
@@ -137,12 +115,10 @@ public class OpeningCutscene : MonoBehaviour
 
     private IEnumerator FadeOutCharacter(GameObject character, float duration)
     {
-        // Try to find a SpriteRenderer to fade.
         SpriteRenderer sr = character.GetComponentInChildren<SpriteRenderer>();
 
         if (sr == null)
         {
-            // No renderer found — just disable immediately.
             character.SetActive(false);
             yield break;
         }

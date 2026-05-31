@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Defines one collectible item: its sprite and the dialogue the player says on pickup.
-/// Create via: Right-click Project → Create → Collectibles → Collectible Item
-/// </summary>
 [CreateAssetMenu(fileName = "NewCollectibleItem", menuName = "Collectibles/Collectible Item")]
 public class CollectibleItemData : ScriptableObject
 {

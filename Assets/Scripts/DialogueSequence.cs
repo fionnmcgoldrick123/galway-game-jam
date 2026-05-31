@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// One ScriptableObject holds an entire conversation.
-/// Create via: Right-click Project → Create → Dialogue → Dialogue Sequence
-/// </summary>
 [CreateAssetMenu(fileName = "NewDialogueSequence", menuName = "Dialogue/Dialogue Sequence")]
 public class DialogueSequence : ScriptableObject
 {

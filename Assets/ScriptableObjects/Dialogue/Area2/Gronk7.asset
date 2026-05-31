@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b717be492f0042947a642e9fba2c11d5, type: 3}
   m_Name: Gronk7
   m_EditorClassIdentifier: 
-  speakerName: Gronk7
+  speakerName: Gronk
   lines:
   - Penny wants some of the Dandy Milkshake.
   - But everyone else can see right through you.

@@ -1,11 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// Attach to any NPC GameObject.
-/// Tag the NPC with "NPC" and give it a Collider2D set to Is Trigger.
-/// Assign a DialogueSequence ScriptableObject in the Inspector.
-/// </summary>
 public class NPCDialogueTrigger : MonoBehaviour
 {
     [Tooltip("The dialogue to play when the player tries to enter this NPC's tile.")]
@@ -28,13 +23,11 @@ public class NPCDialogueTrigger : MonoBehaviour
         _originalScale = transform.localScale;
     }
 
-    /// <summary>Scales up then back down. Awaitable by PlayerController.</summary>
     public IEnumerator Pop()
     {
         Vector3 bigScale = _originalScale * popScale;
         float elapsed = 0f;
 
-        // Scale up
         while (elapsed < popUpDuration)
         {
             elapsed += Time.deltaTime;
@@ -45,7 +38,6 @@ public class NPCDialogueTrigger : MonoBehaviour
 
         elapsed = 0f;
 
-        // Scale back down
         while (elapsed < popDownDuration)
         {
             elapsed += Time.deltaTime;

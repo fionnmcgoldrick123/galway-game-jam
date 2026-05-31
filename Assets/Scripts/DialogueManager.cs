@@ -2,16 +2,6 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-/// <summary>
-/// Manages the dialogue UI and typewriter effect.
-///
-/// Setup:
-///   1. Create a Canvas with a panel (the dialogue box).
-///   2. Add a TextMeshProUGUI for the speaker name and one for the body text.
-///   3. Attach this script to a persistent GameObject (e.g. DialogueManager).
-///   4. Assign the references in the Inspector.
-///   5. The panel's GameObject is toggled on/off automatically.
-/// </summary>
 public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance { get; private set; }
@@ -39,7 +29,7 @@ public class DialogueManager : MonoBehaviour
     [Header("Audio")]
     private AudioSource _audioSource;
 
-    // ── state ────────────────────────────────────────────────────────────────
+
     private DialogueSequence _sequence;
     private int              _lineIndex;
     private bool             _isTyping;
@@ -48,7 +38,6 @@ public class DialogueManager : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
-    /// <summary>Invoked once when the dialogue panel finishes closing. Auto-cleared after each use.</summary>
     public event System.Action onClosed;
 
     void Awake()
@@ -77,26 +66,20 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // ── public API ────────────────────────────────────────────────────────────
 
     public void StartDialogue(DialogueSequence sequence)
     {
         if (sequence == null || sequence.lines == null || sequence.lines.Length == 0)
         {
-            Debug.LogError("[DialogueManager] StartDialogue called with null or empty sequence! Assign lines to the DialogueSequence asset.");
             System.Action cb = onClosed; onClosed = null; cb?.Invoke();
             return;
         }
 
         if (bodyText == null)
         {
-            Debug.LogError("[DialogueManager] Body Text is not assigned! Drag DialodueTXT onto the Body Text field on DialogueManager in the Inspector.");
             System.Action cb = onClosed; onClosed = null; cb?.Invoke();
             return;
         }
-
-        if (dialoguePanel == null)
-            Debug.LogError("[DialogueManager] Dialogue Panel is not assigned! Drag Panel onto the Dialogue Panel field on DialogueManager in the Inspector.");
 
         _sequence    = sequence;
         _lineIndex   = 0;
@@ -109,7 +92,6 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(ShowLineWithCooldown(0));
     }
 
-    // ── internals ──────────────────────────────────────────────────────────────
 
     IEnumerator PopIn()
     {
@@ -164,7 +146,6 @@ public class DialogueManager : MonoBehaviour
         return c3 * t * t * t - c1 * t * t;
     }
 
-    // Wait one frame so the key that triggered dialogue doesn't immediately advance it
     IEnumerator ShowLineWithCooldown(int index)
     {
         _inputCooldown = true;

@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// A single line of NPC dialogue.
-/// Create via: Right-click Project → Create → Dialogue → Dialogue Line
-/// </summary>
 [CreateAssetMenu(fileName = "NewDialogueLine", menuName = "Dialogue/Dialogue Line")]
 public class DialogueLine : ScriptableObject
 {

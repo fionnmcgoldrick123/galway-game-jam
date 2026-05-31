@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Place on the goal tile prefab alongside a Collider2D (Is Trigger = true).
-/// LevelGenerator calls Apply() at runtime to set the item's sprite and dialogue.
-/// </summary>
 public class WinCollectible : MonoBehaviour
 {
     [Tooltip("Scene to load after dialogue ends. -1 = auto next in build order.")]
@@ -19,7 +15,6 @@ public class WinCollectible : MonoBehaviour
         _sr = GetComponentInChildren<SpriteRenderer>();
     }
 
-    /// <summary>Called by LevelGenerator to assign this level's item.</summary>
     public void Apply(CollectibleItemData data)
     {
         if (data == null) return;
@@ -28,7 +23,6 @@ public class WinCollectible : MonoBehaviour
             _sr.sprite = data.sprite;
     }
 
-    /// <summary>Called by PlayerController when the player lands on this tile.</summary>
     public void Collect()
     {
         foreach (var sr in GetComponentsInChildren<SpriteRenderer>())

@@ -1,11 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// On each new tile landing: pick a random pose sprite (never the same as the
-/// last one) and play a small scale pop. The sprite stays until the next move.
-/// After idleDelay seconds of no movement the Animator idle bool is set.
-/// </summary>
 [RequireComponent(typeof(PlayerController))]
 public class PlayerDancing : MonoBehaviour
 {
@@ -27,7 +22,7 @@ public class PlayerDancing : MonoBehaviour
     [Tooltip("Name of the Animator bool parameter to set when idle. Leave blank to ignore.")]
     public string idleAnimatorParam = "Idle";
 
-    // ── private ────────────────────────────────────────────────────────────
+
     private SpriteRenderer   _sr;
     private Animator         _animator;
     private PlayerController _controller;
@@ -37,18 +32,13 @@ public class PlayerDancing : MonoBehaviour
     private Coroutine _popCoroutine;
     private Coroutine _idleCoroutine;
 
-    // ── lifecycle ──────────────────────────────────────────────────────────
 
     void Awake()
     {
-        // Search self first, then children (handles sprite on child object).
         _sr         = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
         _animator   = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         _controller = GetComponent<PlayerController>();
         _baseScale  = transform.localScale;
-
-        if (_sr == null)
-            Debug.LogError("[PlayerDancing] No SpriteRenderer found on this GameObject or its children!");
     }
 
     void OnEnable()
@@ -63,17 +53,13 @@ public class PlayerDancing : MonoBehaviour
         _controller.onMoveStarted -= HandleMoveStarted;
     }
 
-    // ── events ─────────────────────────────────────────────────────────────
-
     void HandleLanded()
     {
-        // Disable Animator so it cannot override the sprite we're about to set.
         if (_animator != null) _animator.enabled = false;
 
         SetRandomPose();
         TriggerPop();
 
-        // Restart idle countdown.
         if (_idleCoroutine != null) StopCoroutine(_idleCoroutine);
         _idleCoroutine = StartCoroutine(IdleTimerCoroutine());
     }
@@ -87,7 +73,6 @@ public class PlayerDancing : MonoBehaviour
         }
     }
 
-    // ── pose ───────────────────────────────────────────────────────────────
 
     void SetRandomPose()
     {
@@ -106,11 +91,8 @@ public class PlayerDancing : MonoBehaviour
 
         _lastPoseIndex = newIndex;
         _sr.sprite     = poseSprites[newIndex];
-
-        Debug.Log($"[PlayerDancing] Pose set to index {newIndex}: {poseSprites[newIndex].name}");
     }
 
-    // ── pop ────────────────────────────────────────────────────────────────
 
     void TriggerPop()
     {
@@ -144,13 +126,11 @@ public class PlayerDancing : MonoBehaviour
         _popCoroutine        = null;
     }
 
-    // ── idle ───────────────────────────────────────────────────────────────
 
     IEnumerator IdleTimerCoroutine()
     {
         yield return new WaitForSeconds(idleDelay);
 
-        // Re-enable Animator for idle animation.
         if (_animator != null)
         {
             _animator.enabled = true;

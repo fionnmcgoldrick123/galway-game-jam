@@ -1,13 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Camera that scrolls upward at a set speed and kills the player if it catches them.
-///
-/// Setup:
-///   1. Attach to Main Camera.
-///   2. Drag the Player into Target.
-///   3. Set Chase Speed per level in the Inspector.
-/// </summary>
 public class CameraFollow : MonoBehaviour
 {
     public static CameraFollow Instance { get; private set; }
@@ -50,31 +42,21 @@ public class CameraFollow : MonoBehaviour
 
         if (chaseEnabled)
         {
-            // Base chase: scroll upward at chase speed
             float chaseY = pos.y + chaseSpeed * Time.deltaTime;
-
-            // Player-lead: if the player is ahead, push camera to keep them in view with look-ahead
             float playerLeadY = target.position.y + lookAhead;
-
-            // Camera Y is whichever is higher — chase floor or player lead
             pos.y = Mathf.Max(chaseY, playerLeadY);
         }
         else
         {
-            // No chase — just follow player with look-ahead
             pos.y = target.position.y + lookAhead;
         }
 
-        // Follow player on X axis
         pos.x = target.position.x + offset.x;
-
-        // Keep Z fixed
         pos.z = -10f;
 
         transform.position = pos;
     }
 
-    /// <summary>Returns true if the player has fallen below the camera's kill line.</summary>
     public bool IsBelowCamera(Vector3 playerPos)
     {
         // Never kill from camera if chase is disabled
@@ -82,7 +64,6 @@ public class CameraFollow : MonoBehaviour
         return playerPos.y < BottomEdge - killMargin;
     }
 
-    /// <summary>Stops all camera movement immediately (call on death or win).</summary>
     public void Freeze()
     {
         chaseEnabled = false;
