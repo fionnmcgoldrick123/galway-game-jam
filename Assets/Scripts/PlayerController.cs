@@ -54,19 +54,21 @@ public class PlayerController : MonoBehaviour
     public event System.Action onMoveStarted;
 
     // ── internal state ──────────────────────────────────────────────────────
-    private Vector3Int _currentCell;
-    private bool       _isMoving;
-    private bool       _isDead;
-    private bool       _inDialogue;
-    private bool       _cutsceneLocked;
-    private Animator   _animator;
-    private Vector3Int _startingCell;
+    private Vector3Int   _currentCell;
+    private bool         _isMoving;
+    private bool         _isDead;
+    private bool         _inDialogue;
+    private bool         _cutsceneLocked;
+    private Animator     _animator;
+    private TrailRenderer _trail;
+    private Vector3Int   _startingCell;
 
     // ── Unity lifecycle ─────────────────────────────────────────────────────
 
     void Start()
     {
         _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+        _trail    = GetComponentInChildren<TrailRenderer>();
 
         if (GridManager.Instance == null)
         {
@@ -427,6 +429,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator Die(Vector3Int fellIntoCell)
     {
         _isDead = true;
+        ClearTrail();
 
         // Slide the player toward the empty cell so it looks like they fell.
         Vector3 startPos   = transform.position;
@@ -451,6 +454,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     IEnumerator PlayDeathThenReload()
     {
+        ClearTrail();
         if (AudioManager.Instance != null) AudioManager.Instance.PlayDeath();
         if (CameraFollow.Instance != null) CameraFollow.Instance.Freeze();
 
@@ -466,6 +470,13 @@ public class PlayerController : MonoBehaviour
         // Fallback: no animator configured.
         yield return new WaitForSeconds(deathDelay);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    void ClearTrail()
+    {
+        if (_trail == null) return;
+        _trail.emitting = false;
+        _trail.Clear();
     }
 
     /// <summary>

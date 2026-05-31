@@ -40,6 +40,8 @@ public class OpeningCutscene : MonoBehaviour
     void Start()
     {
         _player = FindFirstObjectByType<PlayerController>();
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.SetMusicMuted(true);
         StartCoroutine(PlayCutscene());
     }
 
@@ -96,6 +98,9 @@ public class OpeningCutscene : MonoBehaviour
         // Cutscene over — load next scene.
         if (_player != null)
             _player.UnlockCutscene();
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.SetMusicMuted(false);
 
         int nextIndex = SceneManager.GetActiveScene().buildIndex + 1;
         SceneManager.LoadScene(nextIndex);

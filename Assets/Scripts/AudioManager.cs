@@ -135,6 +135,14 @@ public class AudioManager : MonoBehaviour
     /// <summary>Played when the player picks up the win item or enters any win / scene-exit state.</summary>
     public void PlayPickup() => Play(pickupClip);
 
+    /// <summary>Mutes or unmutes the music sources without stopping the playlist.</summary>
+    public void SetMusicMuted(bool muted)
+    {
+        float vol = muted ? 0f : MUSIC_VOLUME;
+        if (_musicA != null) _musicA.volume = vol;
+        if (_musicB != null) _musicB.volume = vol;
+    }
+
     // ── internal ──────────────────────────────────────────────────────────────
 
     void Play(AudioClip clip)
