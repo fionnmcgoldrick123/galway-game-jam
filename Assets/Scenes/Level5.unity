@@ -246,11 +246,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4683433535268881890, guid: b12674fb71d0f0f47b4219a7fbcd3b17, type: 3}
       propertyPath: maxTilesPerRow
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4683433535268881890, guid: b12674fb71d0f0f47b4219a7fbcd3b17, type: 3}
       propertyPath: maxHorizontalStreak
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4683433535268881890, guid: b12674fb71d0f0f47b4219a7fbcd3b17, type: 3}
       propertyPath: winCollectiblePrefab

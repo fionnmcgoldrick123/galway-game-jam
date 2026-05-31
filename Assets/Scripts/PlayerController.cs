@@ -421,9 +421,13 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator DieFromCamera()
     {
-        _isDead = true;
+        _isDead   = true;
+        _isMoving = false;
+        StopAllCoroutines();
+        ClearTrail();
         Debug.Log("[Player] Caught by camera — restarting.");
-        yield return StartCoroutine(PlayDeathThenReload());
+        StartCoroutine(PlayDeathThenReload());
+        yield break;
     }
 
     IEnumerator Die(Vector3Int fellIntoCell)
@@ -463,12 +467,20 @@ public class PlayerController : MonoBehaviour
             // Re-enable in case PlayerDancing disabled it.
             _animator.enabled = true;
             _animator.SetTrigger(deathTrigger);
-            // Scene reload is handled by the animation event — nothing more to do here.
-            yield break;
+            // Wait for animation event, but cap with a timeout so we never hang.
+            float waited = 0f;
+            while (waited < deathDelay + 2f)
+            {
+                waited += Time.deltaTime;
+                yield return null;
+            }
+            // If we reach here the animation event never fired — reload anyway.
+        }
+        else
+        {
+            yield return new WaitForSeconds(deathDelay);
         }
 
-        // Fallback: no animator configured.
-        yield return new WaitForSeconds(deathDelay);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
