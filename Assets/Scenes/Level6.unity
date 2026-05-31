@@ -839,7 +839,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3181884814379337176, guid: 04566b8045ef52a469bf7880177fc2f7, type: 3}
       propertyPath: maxTilesPerRow
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5380352056595073140, guid: 04566b8045ef52a469bf7880177fc2f7, type: 3}
       propertyPath: m_Name
