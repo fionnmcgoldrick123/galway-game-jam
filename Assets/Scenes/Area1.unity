@@ -133,7 +133,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3985799903798884999, guid: 3d9d0d7c7daa4a743b9c7a4716cdb667, type: 3}
       propertyPath: orthographic size
-      value: 6.984375
+      value: 6.84375
       objectReference: {fileID: 0}
     - target: {fileID: 9004511788006171218, guid: 3d9d0d7c7daa4a743b9c7a4716cdb667, type: 3}
       propertyPath: target
@@ -3267,6 +3267,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7411164221214844298, guid: e197fac9b4d78b44aa230ea7fb0f7b88, type: 3}
+      propertyPath: popupPrefab
+      value: 
+      objectReference: {fileID: 533756233039063232, guid: e2070d56418aa5f4fa4792b88d718cb2, type: 3}
     - target: {fileID: 8619654510952837706, guid: e197fac9b4d78b44aa230ea7fb0f7b88, type: 3}
       propertyPath: m_Name
       value: AudioManager

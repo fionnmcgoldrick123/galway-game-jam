@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4387833759505620590}
   - component: {fileID: 8542673864177773991}
+  - component: {fileID: 7411164221214844298}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -54,3 +55,19 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 4bb904b68103c70438d4f5f149762913, type: 3}
   - {fileID: 8300000, guid: fbcd43b92e7f87f479210820bbf37480, type: 3}
   - {fileID: 8300000, guid: 7d4db71973d185e479aeab075e5ce41c, type: 3}
+--- !u!114 &7411164221214844298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8619654510952837706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53843f857eb4678429531c7d797a4eb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  basePointsPerTile: 10
+  showMultiplierAtCombo: 2
+  popupPrefab: {fileID: 0}
+  popupSpawnOffsetY: 0.8
