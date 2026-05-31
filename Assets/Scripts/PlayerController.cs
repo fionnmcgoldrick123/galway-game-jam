@@ -58,6 +58,7 @@ public class PlayerController : MonoBehaviour
     private bool       _isMoving;
     private bool       _isDead;
     private bool       _inDialogue;
+    private bool       _cutsceneLocked;
     private Animator   _animator;
     private Vector3Int _startingCell;
 
@@ -98,7 +99,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (_isDead || _inDialogue) return;
+        if (_isDead || _inDialogue || _cutsceneLocked) return;
 
         // Check if the camera has caught up to the player
         if (CameraFollow.Instance != null && CameraFollow.Instance.IsBelowCamera(transform.position))
@@ -168,10 +169,25 @@ public class PlayerController : MonoBehaviour
             DialogueManager.Instance.StartDialogue(npc.dialogue);
     }
 
-    /// <summary>Called by DialogueManager when dialogue closes.</summary>
+    /// <summary>Called by DialogueManager when dialogue closes. Ignored while a cutscene is running.</summary>
     public void ResumeFromDialogue()
     {
+        if (_cutsceneLocked) return;
         _inDialogue = false;
+    }
+
+    /// <summary>Called by OpeningCutscene to hard-lock input for the full cutscene duration.</summary>
+    public void LockInput()
+    {
+        _cutsceneLocked = true;
+        _inDialogue     = true;
+    }
+
+    /// <summary>Called by OpeningCutscene when the cutscene finishes to restore full control.</summary>
+    public void UnlockCutscene()
+    {
+        _cutsceneLocked = false;
+        _inDialogue     = false;
     }
 
     NPCDialogueTrigger GetNPCAtCell(Vector3Int cell)
