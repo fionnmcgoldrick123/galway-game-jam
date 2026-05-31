@@ -751,6 +751,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2635337031018140478, guid: 2561e8da48ee6e642ac74ce6842676db, type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5117926566797465708, guid: 2561e8da48ee6e642ac74ce6842676db, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -895,11 +899,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beats:
-  - dialogue: {fileID: 11400000, guid: 735841e0764d4ff41b6adb01735e4945, type: 2}
+  - dialogue: {fileID: 11400000, guid: 3dba0062cbce7e14b947bf7cdf2ccf34, type: 2}
+    characterToHide: {fileID: 0}
+    charactersToMoveUp: []
+  - dialogue: {fileID: 11400000, guid: 236b34fcbed2b1a48938c5721109936d, type: 2}
     characterToHide: {fileID: 221356923}
     charactersToMoveUp:
-    - {fileID: 699155881}
     - {fileID: 1823383778}
+    - {fileID: 699155881}
     - {fileID: 2082838360}
     - {fileID: 1119885991}
     - {fileID: 897812591}
@@ -910,9 +917,6 @@ MonoBehaviour:
     characterToHide: {fileID: 1823383778}
     charactersToMoveUp:
     - {fileID: 699155881}
-  - dialogue: {fileID: 11400000, guid: 735841e0764d4ff41b6adb01735e4945, type: 2}
-    characterToHide: {fileID: 0}
-    charactersToMoveUp: []
   - dialogue: {fileID: 11400000, guid: 735841e0764d4ff41b6adb01735e4945, type: 2}
     characterToHide: {fileID: 0}
     charactersToMoveUp: []
@@ -1403,7 +1407,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3985799903798884999, guid: 3d9d0d7c7daa4a743b9c7a4716cdb667, type: 3}
       propertyPath: orthographic size
-      value: 6.84375
+      value: 6.96875
       objectReference: {fileID: 0}
     - target: {fileID: 9017677235649632464, guid: 3d9d0d7c7daa4a743b9c7a4716cdb667, type: 3}
       propertyPath: m_LocalPosition.x

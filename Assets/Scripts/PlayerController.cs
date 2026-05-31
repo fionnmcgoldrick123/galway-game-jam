@@ -70,6 +70,11 @@ public class PlayerController : MonoBehaviour
         _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         _trail    = GetComponentInChildren<TrailRenderer>();
 
+        // Ensure win particles are hidden until an actual win state activates them.
+        ParticleSystem ps = GetComponentInChildren<ParticleSystem>(true);
+        if (ps != null)
+            ps.gameObject.SetActive(false);
+
         if (GridManager.Instance == null)
         {
             Debug.LogError("[PlayerController] GridManager not found in scene!");

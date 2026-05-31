@@ -62,18 +62,6 @@ public class DialogueManager : MonoBehaviour
         if (dialoguePanel) dialoguePanel.SetActive(false);
         if (continuePrompt) continuePrompt.SetActive(false);
         if (darkOverlay) darkOverlay.SetActive(false);
-
-        // Prevent TMP from wrapping text onto new lines.
-        if (bodyText != null)
-        {
-            bodyText.overflowMode       = TextOverflowModes.Overflow;
-            bodyText.enableWordWrapping = false;
-        }
-        if (speakerText != null)
-        {
-            speakerText.overflowMode       = TextOverflowModes.Overflow;
-            speakerText.enableWordWrapping = false;
-        }
     }
 
     void Update()
