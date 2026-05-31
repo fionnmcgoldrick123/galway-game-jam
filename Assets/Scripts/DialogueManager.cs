@@ -105,12 +105,6 @@ public class DialogueManager : MonoBehaviour
         if (darkOverlay) darkOverlay.SetActive(true);
         if (continuePrompt) continuePrompt.SetActive(false);
 
-        if (sequence.sound != null)
-        {
-            _audioSource.volume = sequence.volume;
-            _audioSource.PlayOneShot(sequence.sound);
-        }
-
         StartCoroutine(PopIn());
         StartCoroutine(ShowLineWithCooldown(0));
     }

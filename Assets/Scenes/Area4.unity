@@ -127,6 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4795522520451657706, guid: 27a9af489e775344e8484d0f989062c4, type: 3}
+      propertyPath: dialogue
+      value: 
+      objectReference: {fileID: 11400000, guid: 2fbc6a617bf740d4189053ccaebfa886, type: 2}
     - target: {fileID: 5531721488745167368, guid: 27a9af489e775344e8484d0f989062c4, type: 3}
       propertyPath: m_Name
       value: Female
@@ -194,7 +198,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3985799903798884999, guid: 3d9d0d7c7daa4a743b9c7a4716cdb667, type: 3}
       propertyPath: orthographic size
-      value: 6.984375
+      value: 6.96875
       objectReference: {fileID: 0}
     - target: {fileID: 9004511788006171218, guid: 3d9d0d7c7daa4a743b9c7a4716cdb667, type: 3}
       propertyPath: target
@@ -261,6 +265,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1980407027522915834, guid: 94519f364fb39ae4c93e91f2828aeedf, type: 3}
+      propertyPath: dialogue
+      value: 
+      objectReference: {fileID: 11400000, guid: 95c61829d81262a4ea69f92e814cc6f0, type: 2}
     - target: {fileID: 3839521869317914296, guid: 94519f364fb39ae4c93e91f2828aeedf, type: 3}
       propertyPath: m_Name
       value: Male (1)
@@ -391,6 +399,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1980407027522915834, guid: 94519f364fb39ae4c93e91f2828aeedf, type: 3}
+      propertyPath: dialogue
+      value: 
+      objectReference: {fileID: 11400000, guid: 8503d3701c58ca740a1360629f8a4060, type: 2}
     - target: {fileID: 3839521869317914296, guid: 94519f364fb39ae4c93e91f2828aeedf, type: 3}
       propertyPath: m_Name
       value: Male (2)
@@ -505,6 +517,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4795522520451657706, guid: 27a9af489e775344e8484d0f989062c4, type: 3}
+      propertyPath: dialogue
+      value: 
+      objectReference: {fileID: 11400000, guid: e21d5fe9e8504d24e93d81da3cae9a5a, type: 2}
     - target: {fileID: 5531721488745167368, guid: 27a9af489e775344e8484d0f989062c4, type: 3}
       propertyPath: m_Name
       value: Female (1)
@@ -674,6 +690,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4751470440657291792, guid: 279d278ea15d06b41a29de70f0d8c773, type: 3}
+      propertyPath: dialogue
+      value: 
+      objectReference: {fileID: 11400000, guid: 0a11de5267e09114dab198494fc31478, type: 2}
     - target: {fileID: 7535699503290820314, guid: 279d278ea15d06b41a29de70f0d8c773, type: 3}
       propertyPath: m_Name
       value: AI
@@ -2881,6 +2901,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1980407027522915834, guid: 94519f364fb39ae4c93e91f2828aeedf, type: 3}
+      propertyPath: dialogue
+      value: 
+      objectReference: {fileID: 11400000, guid: 0b0326724df7d0341b6e36b1ecb675dc, type: 2}
     - target: {fileID: 3839521869317914296, guid: 94519f364fb39ae4c93e91f2828aeedf, type: 3}
       propertyPath: m_Name
       value: Male

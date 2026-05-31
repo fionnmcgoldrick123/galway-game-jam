@@ -10,13 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b717be492f0042947a642e9fba2c11d5, type: 3}
-  m_Name: AI-OpeningScene
+  m_Name: Fonda Cox
   m_EditorClassIdentifier: 
-  speakerName: Gronk
+  speakerName: Fonda Cox
   lines:
-  - To answer your question Moby...
-  - You should wear something smart again today!
-  - Sadly it won't help make you any smarter you stupid cuck.
+  - God I hate cocks! They make me sick.
+  - I just want my sweet Candy! Where is she?
   textSpeed: 30
   sound: {fileID: 8300000, guid: 0bce1671f729fa949b077696390576d5, type: 3}
   volume: 1

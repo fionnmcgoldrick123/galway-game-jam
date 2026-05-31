@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b717be492f0042947a642e9fba2c11d5, type: 3}
   m_Name: Moby
   m_EditorClassIdentifier: 
-  speakerName: Moby
+  speakerName: Moby Huge
   lines:
   - Thanks Gronk! You are the best.
   textSpeed: 30
-  sound: {fileID: 0}
+  sound: {fileID: 8300000, guid: 0bce1671f729fa949b077696390576d5, type: 3}
   volume: 1

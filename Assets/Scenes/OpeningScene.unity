@@ -910,17 +910,29 @@ MonoBehaviour:
     - {fileID: 2082838360}
     - {fileID: 1119885991}
     - {fileID: 897812591}
-  - dialogue: {fileID: 11400000, guid: 735841e0764d4ff41b6adb01735e4945, type: 2}
+  - dialogue: {fileID: 11400000, guid: 9da7509adcd7b264689158d27aadb000, type: 2}
     characterToHide: {fileID: 0}
     charactersToMoveUp: []
-  - dialogue: {fileID: 11400000, guid: 735841e0764d4ff41b6adb01735e4945, type: 2}
+  - dialogue: {fileID: 11400000, guid: 66853d5359511934a80143d7109295d1, type: 2}
     characterToHide: {fileID: 1823383778}
     charactersToMoveUp:
     - {fileID: 699155881}
-  - dialogue: {fileID: 11400000, guid: 735841e0764d4ff41b6adb01735e4945, type: 2}
+  - dialogue: {fileID: 11400000, guid: 382b32b1f99290d40a66ab54326eeff8, type: 2}
     characterToHide: {fileID: 0}
     charactersToMoveUp: []
-  - dialogue: {fileID: 11400000, guid: 735841e0764d4ff41b6adb01735e4945, type: 2}
+  - dialogue: {fileID: 11400000, guid: cedb0ccdedbea664b8e5b79e2b2be637, type: 2}
+    characterToHide: {fileID: 0}
+    charactersToMoveUp: []
+  - dialogue: {fileID: 11400000, guid: da33a6e1d9eaf5f4f9e46063f56b3917, type: 2}
+    characterToHide: {fileID: 0}
+    charactersToMoveUp: []
+  - dialogue: {fileID: 11400000, guid: 577abc2fce02d204595e8f62b5ee0bcb, type: 2}
+    characterToHide: {fileID: 0}
+    charactersToMoveUp: []
+  - dialogue: {fileID: 11400000, guid: 145bea0f9e453e14a8b9705748bbf376, type: 2}
+    characterToHide: {fileID: 0}
+    charactersToMoveUp: []
+  - dialogue: {fileID: 11400000, guid: e2577615024b61742a51fdc4a3e15f10, type: 2}
     characterToHide: {fileID: 0}
     charactersToMoveUp: []
   characterMoveTime: 0.4
